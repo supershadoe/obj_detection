@@ -1,0 +1,14 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    - prefer_single_quotes
+    - prefer_final_locals
+    - prefer_final_in_for_each
+    - omit_local_variable_types
+    - avoid_classes_with_only_static_members
+    - require_trailing_commas
+    - use_super_parameters
+    - avoid_void_async
+    - unawaited_futures
+    - unnecessary_await_in_return
