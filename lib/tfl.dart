@@ -119,14 +119,14 @@ class _InterpreterWidgetState extends State<InterpreterWidget> {
 
   Future<IsolateInterpreter> loadInterpreter() async {
     final interpreter = await Interpreter.fromAsset(
-      'assets/efficientdet.tflite',
+      'assets/efficientdet/efficientdet.tflite',
     );
     return IsolateInterpreter.create(address: interpreter.address);
   }
 
   Future<List<String>> loadLabels() async {
     final labels = await rootBundle
-        .loadString('assets/labels.txt')
+        .loadString('assets/efficientdet/labels.txt')
         .then((data) => data.split(RegExp(r'[\r\n]')));
     return labels;
   }

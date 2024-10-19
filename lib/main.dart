@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'tfl_flutter',
+      title: 'obj_detection',
       theme: ThemeData(
         textTheme: Typography.blackMountainView.apply(fontFamily: 'Lato'),
         colorScheme: ColorScheme.fromSeed(

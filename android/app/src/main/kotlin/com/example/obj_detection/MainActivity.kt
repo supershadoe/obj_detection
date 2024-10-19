@@ -1,4 +1,4 @@
-package com.example.tfl_flutter
+package com.example.obj_detection
 
 import io.flutter.embedding.android.FlutterActivity
 
