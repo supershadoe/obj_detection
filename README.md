@@ -6,6 +6,8 @@ package in flutter for object detection.
 The repo has demo of two models - [EfficientDet](https://www.kaggle.com/models/tensorflow/efficientdet/tfLite/lite0-detection-metadata/1)
 and [YOLOv8-Detection](https://huggingface.co/qualcomm/YOLOv8-Detection)
 
+Labels for the dataset were taken from [here](https://github.com/amikelive/coco-labels)
+
 For YOLOv8, post-processing is done entirely using dart and doesn't use any external
 dependencies.
 

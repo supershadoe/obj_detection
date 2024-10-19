@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'tfl.dart';
+import 'package:obj_detection/processing/efficientdet.dart';
 import 'recog.dart';
 
 void main() {
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
           seedColor: const Color.fromARGB(255, 11, 89, 168),
         ),
       ),
-      home: InterpreterWidget(
+      home: EfficientDetLoader(
         child: Builder(
           builder: (context) => const RecogScreen(),
         ),

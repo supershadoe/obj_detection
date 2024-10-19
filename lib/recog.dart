@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'tfl.dart';
+import 'utils.dart';
 
 class _IconButton extends StatelessWidget {
   final String text;
@@ -73,6 +73,8 @@ class _RecogScreenState extends State<RecogScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final imageSize = TFLInterpreter.of(context).inputImageSize;
+
     return PopScope(
       canPop: filePath.isEmpty,
       onPopInvokedWithResult: (didPop, result) {
@@ -140,16 +142,16 @@ class _RecogScreenState extends State<RecogScreen> {
                       children: [
                         Image.file(
                           File(filePath),
-                          width: modelInputSize.toDouble(),
-                          height: modelInputSize.toDouble(),
+                          width: imageSize.toDouble(),
+                          height: imageSize.toDouble(),
                           fit: BoxFit.fill,
                         ),
                         for (final result in results) ...[
                           Positioned(
-                            top: result.box[0] * modelInputSize,
-                            left: result.box[1] * modelInputSize,
-                            height: (result.box[2] - result.box[0]) * modelInputSize,
-                            width: (result.box[3] - result.box[1]) * modelInputSize,
+                            top: result.box[0] * imageSize,
+                            left: result.box[1] * imageSize,
+                            height: (result.box[2] - result.box[0]) * imageSize,
+                            width: (result.box[3] - result.box[1]) * imageSize,
                             child: DecoratedBox(
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.red),
@@ -157,8 +159,8 @@ class _RecogScreenState extends State<RecogScreen> {
                             ),
                           ),
                           Positioned(
-                            top: result.box[0] * modelInputSize - 24,
-                            left: result.box[1] * modelInputSize,
+                            top: result.box[0] * imageSize - 24,
+                            left: result.box[1] * imageSize,
                             child: Container(
                               color: Colors.amber,
                               padding: const EdgeInsets.symmetric(horizontal: 4),
