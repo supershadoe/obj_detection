@@ -1,15 +1,14 @@
 import 'package:flutter/foundation.dart' show compute;
-import 'package:flutter/material.dart';
-import 'package:tflite_flutter/tflite_flutter.dart'
-    show ListShape;
+import 'package:flutter/widgets.dart';
+import 'package:tflite_flutter/tflite_flutter.dart' show ListShape;
 
 import '../interpreter/api.dart';
 import '../interpreter/internals.dart';
 
 class _OutputTensor {
   static const int boxes = 0;
-  static const int scores = 1;
-  static const int classes = 2;
+  static const int classes = 1;
+  static const int scores = 2;
   static const int numDetections = 3;
 }
 
@@ -42,9 +41,9 @@ class EfficientDetDetector extends TFLInterpreter {
     final outputs = {
       _OutputTensor.boxes: List.filled(1 * modelOutputSize * 4, 0.0)
           .reshape([1, modelOutputSize, 4]),
-      _OutputTensor.scores:
-          List.filled(1 * modelOutputSize, 0.0).reshape([1, modelOutputSize]),
       _OutputTensor.classes:
+          List.filled(1 * modelOutputSize, 0.0).reshape([1, modelOutputSize]),
+      _OutputTensor.scores:
           List.filled(1 * modelOutputSize, 0.0).reshape([1, modelOutputSize]),
       _OutputTensor.numDetections: [0.0],
     };
@@ -56,9 +55,9 @@ class EfficientDetDetector extends TFLInterpreter {
       results.add(
         Result(
           box: outputs[_OutputTensor.boxes]![0][i],
-          score: outputs[_OutputTensor.classes]![0][i],
+          score: outputs[_OutputTensor.scores]![0][i],
           label:
-              labels[(outputs[_OutputTensor.scores]![0][i] as double).toInt()],
+              labels[(outputs[_OutputTensor.classes]![0][i] as double).toInt()],
         ),
       );
     }
