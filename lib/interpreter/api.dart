@@ -1,8 +1,8 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart' show BuildContext, InheritedWidget, Rect;
 import 'package:tflite_flutter/tflite_flutter.dart' show IsolateInterpreter;
 
 class Result {
-  final List<double> box;
+  final Rect box;
   final double score;
   final String label;
 

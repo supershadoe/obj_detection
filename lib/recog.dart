@@ -61,6 +61,8 @@ class _RecogScreenState extends State<RecogScreen> {
     if (image == null || !context.mounted) return;
     setState(() {
       filePath = image.path;
+      results = [];
+      error = false;
     });
     final tflResult =
         await InterpreterWidget.of(context).detect(filePath: image.path);
@@ -147,11 +149,8 @@ class _RecogScreenState extends State<RecogScreen> {
                           fit: BoxFit.fill,
                         ),
                         for (final result in results) ...[
-                          Positioned(
-                            top: result.box[0] * imageSize,
-                            left: result.box[1] * imageSize,
-                            height: (result.box[2] - result.box[0]) * imageSize,
-                            width: (result.box[3] - result.box[1]) * imageSize,
+                          Positioned.fromRect(
+                            rect: result.box,
                             child: DecoratedBox(
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.red),
@@ -159,8 +158,8 @@ class _RecogScreenState extends State<RecogScreen> {
                             ),
                           ),
                           Positioned(
-                            top: result.box[0] * imageSize - 24,
-                            left: result.box[1] * imageSize,
+                            top: result.box.top - 24,
+                            left: result.box.left,
                             child: Container(
                               color: Colors.amber,
                               padding: const EdgeInsets.symmetric(horizontal: 4),

@@ -52,9 +52,16 @@ class EfficientDetDetector extends TFLInterpreter {
     final results = <Result>[];
     final numDetections = outputs[_OutputTensor.numDetections]![0] as double;
     for (var i = 0; i < numDetections; ++i) {
+      final rawBox = List.castFrom<dynamic, double>(outputs[_OutputTensor.boxes]![0][i]);
+      final box = Rect.fromLTWH(
+        rawBox[1] * modelInputSize,
+        rawBox[0] * modelInputSize,
+        (rawBox[3] - rawBox[1]) * modelInputSize,
+        (rawBox[2] - rawBox[0]) * modelInputSize,
+      );
       results.add(
         Result(
-          box: outputs[_OutputTensor.boxes]![0][i],
+          box: box,
           score: outputs[_OutputTensor.scores]![0][i],
           label:
               labels[(outputs[_OutputTensor.classes]![0][i] as double).toInt()],

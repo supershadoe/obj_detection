@@ -46,9 +46,16 @@ class YoloV8Detector extends TFLInterpreter {
 
     final results = <Result>[];
     for (var i = 0; i < modelOutputSize; ++i) {
+      final rawBox = List.castFrom<dynamic, double>(outputs[_OutputTensor.boxes]![0][i]);
+      final box = Rect.fromLTWH(
+        rawBox[1],
+        rawBox[0],
+        (rawBox[3] - rawBox[1]),
+        (rawBox[2] - rawBox[0]),
+      );
       results.add(
         Result(
-          box: outputs[_OutputTensor.boxes]![0][i],
+          box: box,
           score: outputs[_OutputTensor.scores]![0][i],
           label:
               labels[(outputs[_OutputTensor.classIdx]![0][i] as double).toInt()],
