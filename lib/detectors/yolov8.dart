@@ -12,41 +12,84 @@ class _OutputTensor {
 }
 
 class YoloV8Detector extends TFLInterpreter {
-  static const modelInputSize = 640;
-  static const modelOutputSize = 8400;
-  static const modelScoreThreshold = 0.4;
+  static const _inputSize = 640;
+  static const _outputSize = 8400;
+  static const _scoreThreshold = 0.6;
+  static const _iouThreshold = 0.5;
 
   const YoloV8Detector({required super.interpreter, required super.labels});
 
   @override
-  int get inputImageSize => modelInputSize;
+  int get inputImageSize => _inputSize;
+
+  /// Implements non-maximum suppression to filter out similar bounding boxes
+  /// of same class and remove boxes that do not cross the confidence
+  /// threshold.
+  List<Result> _postProcessUsingNMS(List<Result> modelOutput) {
+    // Filter and Sort by score
+    final List<Result?> results = modelOutput
+        .where((op) => op.score >= _scoreThreshold)
+        .toList()
+      ..sort((a, b) => b.score.compareTo(a.score));
+
+    // To optimize for classes already processed
+    final classesTraversed = <String>{};
+
+    for (final (i, r1) in results.indexed) {
+      if (r1 == null || classesTraversed.contains(r1.label)) continue;
+      classesTraversed.add(r1.label);
+
+      final area = r1.box.width * r1.box.height;
+
+      for (final (j, r2) in results.indexed) {
+        // Skip the previous boxes and match only boxes of same class
+        // after current box
+        if (j <= i || r2 == null || r1.label != r2.label) continue;
+
+        final pickedArea = r2.box.width * r2.box.height;
+
+        final intersectRect = r1.box.intersect(r2.box);
+        final intersectArea = intersectRect.width * intersectRect.height;
+
+        final unionArea = area + pickedArea - intersectArea;
+        final iou = intersectArea / unionArea;
+
+        if (iou >= _iouThreshold) {
+          results[j] = null;
+        }
+      }
+    }
+
+    return results.nonNulls.toList();
+  }
 
   @override
   Future<List<Result>?> detect({required String filePath}) async {
     // Pre-process image
     final data = await compute(
-      (path) => copyResizeFile(path, modelInputSize, modelInputSize),
+      (path) => copyResizeFile(path, _inputSize, _inputSize),
       filePath,
       debugLabel: 'image_process',
     );
     if (data == null) return null;
 
     // Re-shape data
-    final input = data.reshape([1, modelInputSize, modelInputSize, 3]);
+    final input = data.reshape([1, _inputSize, _inputSize, 3]);
 
     final outputs = {
-      _OutputTensor.boxes: List.filled(1 * modelOutputSize * 4, 0.0)
-          .reshape([1, modelOutputSize, 4]),
+      _OutputTensor.boxes:
+          List.filled(1 * _outputSize * 4, 0.0).reshape([1, _outputSize, 4]),
       _OutputTensor.scores:
-          List.filled(1 * modelOutputSize, 0.0).reshape([1, modelOutputSize]),
+          List.filled(1 * _outputSize, 0.0).reshape([1, _outputSize]),
       _OutputTensor.classIdx:
-          List.filled(1 * modelOutputSize, 0.0).reshape([1, modelOutputSize]),
+          List.filled(1 * _outputSize, 0.0).reshape([1, _outputSize]),
     };
     await interpreter.runForMultipleInputs([input], outputs);
 
     final results = <Result>[];
-    for (var i = 0; i < modelOutputSize; ++i) {
-      final rawBox = List.castFrom<dynamic, double>(outputs[_OutputTensor.boxes]![0][i]);
+    for (var i = 0; i < _outputSize; ++i) {
+      final rawBox =
+          List.castFrom<dynamic, double>(outputs[_OutputTensor.boxes]![0][i]);
       final box = Rect.fromLTWH(
         rawBox[1],
         rawBox[0],
@@ -57,17 +100,13 @@ class YoloV8Detector extends TFLInterpreter {
         Result(
           box: box,
           score: outputs[_OutputTensor.scores]![0][i],
-          label:
-              labels[(outputs[_OutputTensor.classIdx]![0][i] as double).toInt()],
+          label: labels[
+              (outputs[_OutputTensor.classIdx]![0][i] as double).toInt()],
         ),
       );
     }
 
-    // TODO: add post-processing
-
-    return results
-        .where((result) => result.score >= modelScoreThreshold)
-        .toList();
+    return _postProcessUsingNMS(results);
   }
 }
 
