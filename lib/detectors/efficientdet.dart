@@ -1,9 +1,10 @@
 import 'package:flutter/foundation.dart' show compute;
 import 'package:flutter/material.dart';
 import 'package:tflite_flutter/tflite_flutter.dart'
-    show IsolateInterpreter, ListShape;
+    show ListShape;
 
-import '../utils.dart';
+import '../interpreter/api.dart';
+import '../interpreter/internals.dart';
 
 class _OutputTensor {
   static const int boxes = 0;
@@ -21,10 +22,8 @@ class EfficientDetDetector extends TFLInterpreter {
   int get inputImageSize => modelInputSize;
 
   const EfficientDetDetector({
-    super.key,
     required super.interpreter,
     required super.labels,
-    required super.child,
   });
 
   @override
@@ -70,46 +69,20 @@ class EfficientDetDetector extends TFLInterpreter {
   }
 }
 
-class EfficientDetLoader extends StatefulWidget {
-  final Widget child;
-  const EfficientDetLoader({super.key, required this.child});
-
-  @override
-  State<EfficientDetLoader> createState() => _EfficientDetLoaderState();
-}
-
-class _EfficientDetLoaderState extends State<EfficientDetLoader>
-    with InterpreterLoader {
-  @override
-  final modelPath = 'assets/efficientdet/efficientdet.tflite';
-  @override
-  final labelsPath = 'assets/efficientdet/coco-labels-paper.txt';
-
-  late final Future<(IsolateInterpreter, List<String>)> _future;
-
-  @override
-  void initState() {
-    super.initState();
-    _future = loadDependencies();
-  }
+class EfficientDetBuilder extends StatelessWidget {
+  final Widget Function(BuildContext) builder;
+  const EfficientDetBuilder({super.key, required this.builder});
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _future,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (snapshot.hasError) {
-          return Center(child: Text('${snapshot.error}'));
-        }
-        return EfficientDetDetector(
-          interpreter: snapshot.requireData.$1,
-          labels: snapshot.requireData.$2,
-          child: widget.child,
-        );
-      },
+    return InterpreterBuilder(
+      modelPath: 'assets/efficientdet/efficientdet.tflite',
+      labelsPath: 'assets/efficientdet/coco-labels-paper.txt',
+      detectorBuilder: (interpreter, labels) => EfficientDetDetector(
+        interpreter: interpreter,
+        labels: labels,
+      ),
+      builder: builder,
     );
   }
 }

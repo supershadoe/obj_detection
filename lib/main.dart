@@ -19,11 +19,7 @@ class MyApp extends StatelessWidget {
           seedColor: const Color.fromARGB(255, 11, 89, 168),
         ),
       ),
-      home: EfficientDetLoader(
-        child: Builder(
-          builder: (context) => const RecogScreen(),
-        ),
-      ),
+      home: EfficientDetBuilder(builder: (context) => const RecogScreen()),
     );
   }
 }

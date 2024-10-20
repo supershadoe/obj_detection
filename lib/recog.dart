@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'utils.dart' show Result, TFLInterpreter;
+import 'interpreter/api.dart' show InterpreterWidget, Result;
 
 class _IconButton extends StatelessWidget {
   final String text;
@@ -63,7 +63,7 @@ class _RecogScreenState extends State<RecogScreen> {
       filePath = image.path;
     });
     final tflResult =
-        await TFLInterpreter.of(context).detect(filePath: image.path);
+        await InterpreterWidget.of(context).detect(filePath: image.path);
     if (!context.mounted || filePath.isEmpty) return;
     setState(() {
       error = tflResult == null;
@@ -73,7 +73,7 @@ class _RecogScreenState extends State<RecogScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final imageSize = TFLInterpreter.of(context).inputImageSize;
+    final imageSize = InterpreterWidget.of(context).inputImageSize;
 
     return PopScope(
       canPop: filePath.isEmpty,
