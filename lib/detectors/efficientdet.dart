@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:tflite_flutter/tflite_flutter.dart'
     show IsolateInterpreter, ListShape;
 
-import '../utils.dart'
-    show InterpreterLoader, Result, TFLInterpreter, copyResizeFile;
+import '../utils.dart';
 
 class _OutputTensor {
   static const int boxes = 0;

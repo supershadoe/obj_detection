@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'utils.dart';
+import 'utils.dart' show Result, TFLInterpreter;
 
 class _IconButton extends StatelessWidget {
   final String text;

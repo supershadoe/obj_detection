@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:obj_detection/processing/efficientdet.dart';
+import 'detectors/efficientdet.dart';
 import 'recog.dart';
 
 void main() {

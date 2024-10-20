@@ -2,6 +2,7 @@ include: package:flutter_lints/flutter.yaml
 
 linter:
   rules:
+    - prefer_relative_imports
     - prefer_single_quotes
     - prefer_final_locals
     - prefer_final_in_for_each
