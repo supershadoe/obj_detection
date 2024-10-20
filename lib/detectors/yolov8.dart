@@ -14,8 +14,8 @@ class _OutputTensor {
 class YoloV8Detector extends TFLInterpreter {
   static const _inputSize = 640;
   static const _outputSize = 8400;
-  static const _scoreThreshold = 0.6;
-  static const _iouThreshold = 0.5;
+  static const _scoreThreshold = 0.7;
+  static const _iouThreshold = 0.4;
 
   const YoloV8Detector({required super.interpreter, required super.labels});
 
@@ -27,40 +27,48 @@ class YoloV8Detector extends TFLInterpreter {
   /// threshold.
   List<Result> _postProcessUsingNMS(List<Result> modelOutput) {
     // Filter and Sort by score
-    final List<Result?> results = modelOutput
+    final outputs = modelOutput
         .where((op) => op.score >= _scoreThreshold)
         .toList()
       ..sort((a, b) => b.score.compareTo(a.score));
 
-    // To optimize for classes already processed
-    final classesTraversed = <String>{};
+    // To mark which elements to keep
+    final keep = List<bool?>.filled(outputs.length, null);
 
-    for (final (i, r1) in results.indexed) {
-      if (r1 == null || classesTraversed.contains(r1.label)) continue;
-      classesTraversed.add(r1.label);
+    while (keep.any((e) => e == null)) {
+      for (final (i, r1) in outputs.indexed) {
+        if (keep[i] != null) continue;
 
-      final area = r1.box.width * r1.box.height;
+        keep[i] = true;
 
-      for (final (j, r2) in results.indexed) {
-        // Skip the previous boxes and match only boxes of same class
-        // after current box
-        if (j <= i || r2 == null || r1.label != r2.label) continue;
+        final area = r1.box.width * r1.box.height;
 
-        final pickedArea = r2.box.width * r2.box.height;
+        for (final (j, r2) in outputs.indexed) {
+          // Skip the previous boxes and match only boxes of same class
+          // after current box
+          if (j <= i || keep[j] != null || r1.label != r2.label) continue;
 
-        final intersectRect = r1.box.intersect(r2.box);
-        final intersectArea = intersectRect.width * intersectRect.height;
+          final pickedArea = r2.box.width * r2.box.height;
 
-        final unionArea = area + pickedArea - intersectArea;
-        final iou = intersectArea / unionArea;
+          final intersectRect = r1.box.intersect(r2.box);
+          final intersectArea = intersectRect.width * intersectRect.height;
 
-        if (iou >= _iouThreshold) {
-          results[j] = null;
+          final unionArea = area + pickedArea - intersectArea;
+          final iou = intersectArea / unionArea;
+
+          if (iou < 0 || iou >= _iouThreshold) {
+            keep[j] = false;
+          } else {
+            print('picked($r1, $r2, $area, $pickedArea, $intersectArea, $unionArea, $iou)');
+          }
         }
       }
     }
 
-    return results.nonNulls.toList();
+    return outputs.indexed
+        .where((e) => keep[e.$1] ?? false)
+        .map((e) => e.$2)
+        .toList();
   }
 
   @override
