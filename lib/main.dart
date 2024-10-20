@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'detectors/efficientdet.dart';
-import 'detectors/yolov8.dart';
-import 'recog.dart';
+import 'choose_model.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,7 +18,7 @@ class MyApp extends StatelessWidget {
           seedColor: const Color.fromARGB(255, 11, 89, 168),
         ),
       ),
-      home: YoloV8Builder(builder: (context) => const RecogScreen()),
+      home: const ChooseModelScreen(),
     );
   }
 }

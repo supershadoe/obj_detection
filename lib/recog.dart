@@ -1,40 +1,13 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'interpreter/api.dart' show InterpreterWidget, Result;
-
-class _IconButton extends StatelessWidget {
-  final String text;
-  final IconData icon;
-  final FutureOr<void> Function() onPressed;
-  const _IconButton({
-    required this.text,
-    required this.icon,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon),
-          Padding(
-            padding: const EdgeInsetsDirectional.only(start: 8),
-            child: Text(text),
-          ),
-        ],
-      ),
-    );
-  }
-}
+import 'widgets.dart';
 
 class RecogScreen extends StatefulWidget {
-  const RecogScreen({super.key});
+  final String modelName;
+  const RecogScreen({super.key, required this.modelName});
 
   @override
   State<RecogScreen> createState() => _RecogScreenState();
@@ -90,7 +63,7 @@ class _RecogScreenState extends State<RecogScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Obj detection'),
+          title: Text(widget.modelName),
           elevation: 0,
         ),
         body: Padding(
@@ -107,14 +80,14 @@ class _RecogScreenState extends State<RecogScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _IconButton(
+                    IconTextButton(
                       text: 'Take picture',
                       icon: Icons.camera_outlined,
                       onPressed: () =>
                           _onPress(context, picker, ImageSource.camera),
                     ),
                     const SizedBox(height: 8),
-                    _IconButton(
+                    IconTextButton(
                       text: 'Select image',
                       icon: Icons.photo_album_outlined,
                       onPressed: () =>
