@@ -13,12 +13,12 @@ class _OutputTensor {
 }
 
 class EfficientDetDetector extends TFLInterpreter {
-  static const modelInputSize = 320;
-  static const modelOutputSize = 25;
-  static const modelScoreThreshold = 0.4;
+  static const _inputSize = 320;
+  static const _outputSize = 25;
+  static const _scoreThreshold = 0.4;
 
   @override
-  int get inputImageSize => modelInputSize;
+  int get inputImageSize => _inputSize;
 
   const EfficientDetDetector({
     required super.interpreter,
@@ -29,22 +29,22 @@ class EfficientDetDetector extends TFLInterpreter {
   Future<List<Result>?> detect({required String filePath}) async {
     // Pre-process image
     final data = await compute(
-      (path) => copyResizeFile(path, modelInputSize, modelInputSize),
+      (path) => copyResizeFile(path, _inputSize, _inputSize),
       filePath,
       debugLabel: 'image_process',
     );
     if (data == null) return null;
 
     // Re-shape data
-    final input = data.reshape([1, modelInputSize, modelInputSize, 3]);
+    final input = data.reshape([1, _inputSize, _inputSize, 3]);
 
     final outputs = {
-      _OutputTensor.boxes: List.filled(1 * modelOutputSize * 4, 0.0)
-          .reshape([1, modelOutputSize, 4]),
+      _OutputTensor.boxes: List.filled(1 * _outputSize * 4, 0.0)
+          .reshape([1, _outputSize, 4]),
       _OutputTensor.classes:
-          List.filled(1 * modelOutputSize, 0.0).reshape([1, modelOutputSize]),
+          List.filled(1 * _outputSize, 0.0).reshape([1, _outputSize]),
       _OutputTensor.scores:
-          List.filled(1 * modelOutputSize, 0.0).reshape([1, modelOutputSize]),
+          List.filled(1 * _outputSize, 0.0).reshape([1, _outputSize]),
       _OutputTensor.numDetections: [0.0],
     };
     await interpreter.runForMultipleInputs([input], outputs);
@@ -54,10 +54,10 @@ class EfficientDetDetector extends TFLInterpreter {
     for (var i = 0; i < numDetections; ++i) {
       final rawBox = List.castFrom<dynamic, double>(outputs[_OutputTensor.boxes]![0][i]);
       final box = Rect.fromLTWH(
-        rawBox[1] * modelInputSize,
-        rawBox[0] * modelInputSize,
-        (rawBox[3] - rawBox[1]) * modelInputSize,
-        (rawBox[2] - rawBox[0]) * modelInputSize,
+        rawBox[1] * _inputSize,
+        rawBox[0] * _inputSize,
+        (rawBox[3] - rawBox[1]) * _inputSize,
+        (rawBox[2] - rawBox[0]) * _inputSize,
       );
       results.add(
         Result(
@@ -70,7 +70,7 @@ class EfficientDetDetector extends TFLInterpreter {
     }
 
     return results
-        .where((result) => result.score >= modelScoreThreshold)
+        .where((result) => result.score >= _scoreThreshold)
         .toList();
   }
 }
