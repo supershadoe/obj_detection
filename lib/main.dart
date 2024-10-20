@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'detectors/efficientdet.dart';
+import 'detectors/yolov8.dart';
 import 'recog.dart';
 
 void main() {
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
           seedColor: const Color.fromARGB(255, 11, 89, 168),
         ),
       ),
-      home: EfficientDetBuilder(builder: (context) => const RecogScreen()),
+      home: YoloV8Builder(builder: (context) => const RecogScreen()),
     );
   }
 }
