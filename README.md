@@ -8,8 +8,8 @@ and [YOLOv8-Detection](https://huggingface.co/qualcomm/YOLOv8-Detection)
 
 Labels for the dataset were taken from [here](https://github.com/amikelive/coco-labels)
 
-For YOLOv8, post-processing is done entirely using dart and doesn't use any external
-dependencies.
+For YOLOv8, post-processing was attempted to be done entirely using dart without
+any external dependencies. (**Did not really accomplish that, it's still a WIP**)
 
 ## How to run
 1. Install Flutter by following the [docs](https://docs.flutter.dev/get-started/install)
