@@ -1,4 +1,4 @@
-package com.example.obj_detection
+package dev.shadoe.objdetection
 
 import io.flutter.embedding.android.FlutterActivity
 
