@@ -1,9 +1,9 @@
-# obj_detection
+### Object detection using Flutter
 
 This app serves as a demo of the [tflite_flutter](https://pub.dev/packages/tflite_flutter)
 package in flutter for object detection.
 
-The repo has demo of two models - [EfficientDet](https://www.kaggle.com/models/tensorflow/efficientdet/tfLite/lite4-detection-default/2)
+The app features two models: [EfficientDet](https://www.kaggle.com/models/tensorflow/efficientdet/tfLite/lite4-detection-default/2)
 and [YOLOv8-Detection](https://huggingface.co/qualcomm/YOLOv8-Detection)
 
 Labels for the dataset were taken from [here](https://github.com/amikelive/coco-labels)
