@@ -32,41 +32,39 @@ class YoloV8Detector extends TFLInterpreter {
         .toList()
       ..sort((a, b) => b.score.compareTo(a.score));
 
-    // To mark which elements to keep
-    final keep = List<bool?>.filled(outputs.length, null);
+    final areas = outputs
+        .map((op) => op.box.width * op.box.height)
+        .toList(growable: false);
+    final picked = <int>[];
 
-    while (keep.any((e) => e == null)) {
-      for (final (i, r1) in outputs.indexed) {
-        if (keep[i] != null) continue;
+    for (final (i, candidate) in outputs.indexed) {
+      var keep = true;
+      final candidateArea = areas[i];
+      for (final j in picked) {
+        final pickedBox = outputs[j];
 
-        keep[i] = true;
+        if (candidate.label != pickedBox.label) continue;
 
-        final area = r1.box.width * r1.box.height;
+        final pickedArea = areas[j];
 
-        for (final (j, r2) in outputs.indexed) {
-          // Skip the previous boxes and match only boxes of same class
-          // after current box
-          if (j <= i || keep[j] != null || r1.label != r2.label) continue;
+        final intersectRect = candidate.box.intersect(pickedBox.box);
+        final intersectArea = intersectRect.width * intersectRect.height;
 
-          final pickedArea = r2.box.width * r2.box.height;
+        final unionArea = candidateArea + pickedArea - intersectArea;
 
-          final intersectRect = r1.box.intersect(r2.box);
-          final intersectArea = intersectRect.width * intersectRect.height;
+        final iou = intersectArea / unionArea;
 
-          final unionArea = area + pickedArea - intersectArea;
-          final iou = intersectArea / unionArea;
-
-          if (iou > _iouThreshold) {
-            keep[j] = false;
-          }
+        if (unionArea > 0 && iou > _iouThreshold) {
+          keep = false;
+          break;
         }
+      }
+      if (keep) {
+        picked.add(i);
       }
     }
 
-    return outputs.indexed
-        .where((e) => keep[e.$1] ?? false)
-        .map((e) => e.$2)
-        .toList();
+    return picked.map((i) => outputs[i]).toList();
   }
 
   @override
