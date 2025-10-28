@@ -15,7 +15,7 @@ class _OutputTensor {
 }
 
 class EfficientDetDetector extends Detector {
-  static const _inputSize = 320;
+  static const _inputSize = 640;
   static const _outputSize = 25;
   static const _scoreThreshold = 0.4;
 
@@ -56,11 +56,11 @@ class EfficientDetDetector extends Detector {
     for (var i = 0; i < numDetections; ++i) {
       final rawBox =
           List.castFrom<dynamic, double>(outputs[_OutputTensor.boxes]![0][i]);
-      final box = Rect.fromLTWH(
+      final box = Rect.fromLTRB(
         rawBox[1] * _inputSize,
         rawBox[0] * _inputSize,
-        (rawBox[3] - rawBox[1]) * _inputSize,
-        (rawBox[2] - rawBox[0]) * _inputSize,
+        rawBox[3] * _inputSize,
+        rawBox[2] * _inputSize,
       );
       results.add(
         Result(
