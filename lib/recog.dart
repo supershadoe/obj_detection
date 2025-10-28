@@ -113,40 +113,15 @@ class _RecogScreenState extends State<RecogScreen> {
               if (filePath.isNotEmpty)
                 Expanded(
                   child: Center(
-                    child: Stack(
-                      children: [
-                        Image.file(
-                          File(filePath),
-                          width: imageSize.toDouble(),
-                          height: imageSize.toDouble(),
-                          fit: BoxFit.fill,
-                        ),
-                        for (final result in results) ...[
-                          Positioned.fromRect(
-                            rect: result.box,
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.red),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            top: result.box.top - 24,
-                            left: result.box.left,
-                            child: Container(
-                              color: Colors.amber,
-                              padding: const EdgeInsets.symmetric(horizontal: 4),
-                              child: Text(
-                                '${result.label} '
-                                '(${(result.score * 100).toStringAsFixed(2)}%)',
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return _RecogImage(
+                          constraints: constraints,
+                          imageSize: imageSize,
+                          imagePath: filePath,
+                          results: results,
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -154,6 +129,88 @@ class _RecogScreenState extends State<RecogScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _RecogImage extends StatelessWidget {
+  final BoxConstraints constraints;
+  final int imageSize;
+  final String imagePath;
+  final List<Result> results;
+
+  const _RecogImage({
+    required this.constraints,
+    required this.imageSize,
+    required this.imagePath,
+    required this.results,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final availableWidth = constraints.maxWidth;
+    final availableHeight = constraints.maxHeight;
+    // should be 1 because we are just using square images for now.
+    final imageAspectRatio = imageSize / imageSize;
+
+    double displayedWidth;
+    double displayedHeight;
+
+    final containerAspectRatio = availableWidth / availableHeight;
+    if (containerAspectRatio > imageAspectRatio) {
+      displayedHeight = availableHeight;
+      displayedWidth = availableHeight * imageAspectRatio;
+    } else {
+      displayedWidth = availableWidth;
+      displayedHeight = availableWidth / imageAspectRatio;
+    }
+
+    final scale = displayedWidth / imageSize;
+
+    // offset is necessary if the image is already smaller than the
+    // available space.
+    final offsetX = (availableWidth - displayedWidth) / 2;
+    final offsetY = (availableHeight - displayedHeight) / 2;
+
+    return Stack(
+      children: [
+        Image.file(
+          File(imagePath),
+          width: imageSize.toDouble(),
+          height: imageSize.toDouble(),
+          fit: BoxFit.contain,
+        ),
+        for (final result in results) ...[
+          Positioned.fromRect(
+            rect: Rect.fromLTWH(
+              result.box.left * scale + offsetX,
+              result.box.top * scale + offsetY,
+              result.box.width * scale,
+              result.box.height * scale,
+            ),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.red, width: 2),
+              ),
+            ),
+          ),
+          Positioned(
+            top: result.box.top * scale + offsetY - 24,
+            left: result.box.left * scale + offsetX,
+            child: Container(
+              color: Colors.amber,
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Text(
+                '${result.label} '
+                '(${(result.score * 100).toStringAsFixed(2)}%)',
+                style: const TextStyle(
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

@@ -56,10 +56,8 @@ class YoloV8Detector extends TFLInterpreter {
           final unionArea = area + pickedArea - intersectArea;
           final iou = intersectArea / unionArea;
 
-          if (iou < 0 || iou >= _iouThreshold) {
+          if (iou > _iouThreshold) {
             keep[j] = false;
-          } else {
-            print('picked($r1, $r2, $area, $pickedArea, $intersectArea, $unionArea, $iou)');
           }
         }
       }
@@ -81,8 +79,11 @@ class YoloV8Detector extends TFLInterpreter {
     );
     if (data == null) return null;
 
-    // Re-shape data
-    final input = data.reshape([1, _inputSize, _inputSize, 3]);
+    // Normalize and reshape data
+    final input = data
+        .map((pixel) => pixel / 255.0)
+        .toList()
+        .reshape([1, _inputSize, _inputSize, 3]);
 
     final outputs = {
       _OutputTensor.boxes:
@@ -98,12 +99,7 @@ class YoloV8Detector extends TFLInterpreter {
     for (var i = 0; i < _outputSize; ++i) {
       final rawBox =
           List.castFrom<dynamic, double>(outputs[_OutputTensor.boxes]![0][i]);
-      final box = Rect.fromLTWH(
-        rawBox[1],
-        rawBox[0],
-        (rawBox[3] - rawBox[1]),
-        (rawBox[2] - rawBox[0]),
-      );
+      final box = Rect.fromLTRB(rawBox[0], rawBox[1], rawBox[2], rawBox[3]);
       results.add(
         Result(
           box: box,
