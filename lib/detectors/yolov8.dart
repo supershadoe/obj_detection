@@ -15,7 +15,7 @@ class YoloV8Detector extends TFLInterpreter {
   static const _inputSize = 640;
   static const _outputSize = 8400;
   static const _scoreThreshold = 0.7;
-  static const _iouThreshold = 0.4;
+  static const _iouThreshold = 0.5;
 
   const YoloV8Detector({required super.interpreter, required super.labels});
 
