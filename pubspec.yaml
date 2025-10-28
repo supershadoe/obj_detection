@@ -23,7 +23,6 @@ flutter:
   assets:
     - assets/efficientdet/
     - assets/yolov8-detection/
-    - assets/face-detector/
   fonts:
     - family: Lato
       fonts:
