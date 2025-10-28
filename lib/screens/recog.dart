@@ -1,9 +1,9 @@
-import 'dart:io';
+import 'dart:io' show File;
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../interpreter/api.dart' show InterpreterWidget, Result;
-import '../widgets.dart';
+import '../api.dart' show Result;
+import '../widgets.dart' show DetectorWrapper, IconTextButton;
 
 class RecogScreen extends StatefulWidget {
   final String modelName;
@@ -38,7 +38,7 @@ class _RecogScreenState extends State<RecogScreen> {
       error = false;
     });
     final tflResult =
-        await InterpreterWidget.of(context).detect(filePath: image.path);
+        await DetectorWrapper.of(context).detect(filePath: image.path);
     if (!context.mounted || filePath.isEmpty) return;
     setState(() {
       error = tflResult == null;
@@ -48,7 +48,7 @@ class _RecogScreenState extends State<RecogScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final imageSize = InterpreterWidget.of(context).inputImageSize;
+    final imageSize = DetectorWrapper.of(context).inputImageSize;
 
     return PopScope(
       canPop: filePath.isEmpty,
