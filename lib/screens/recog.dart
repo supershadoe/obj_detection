@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'interpreter/api.dart' show InterpreterWidget, Result;
-import 'widgets.dart';
+import '../interpreter/api.dart' show InterpreterWidget, Result;
+import '../widgets.dart';
 
 class RecogScreen extends StatefulWidget {
   final String modelName;

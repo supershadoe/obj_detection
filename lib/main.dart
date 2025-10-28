@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'choose_model.dart';
+import 'screens/choose_model.dart';
 
 void main() {
   runApp(const MyApp());

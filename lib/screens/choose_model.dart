@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'detectors/efficientdet.dart';
-import 'detectors/yolov8.dart';
+import '../detectors/efficientdet.dart';
+import '../detectors/yolov8.dart';
 import 'recog.dart';
 
 class ChooseModelScreen extends StatelessWidget {
